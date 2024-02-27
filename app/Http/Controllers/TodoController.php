@@ -4,11 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\TodoService;
-use Exception;
-use Illuminate\Database\QueryException;
 use Illuminate\Http\Response;
-use Throwable;
-use Whoops\Exception\ErrorException;
+use Exception;
 
 class TodoController extends Controller
 {
@@ -24,14 +21,6 @@ class TodoController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
      * Display the specified resource.
      */
     public function showAll()
@@ -42,7 +31,7 @@ class TodoController extends Controller
                 'data' => $this->todoService->getAll(),
                 'message' => 'get all tasks success.'
             ];
-        } catch (QueryException $error) {
+        } catch (Exception $error) {
             $result = [
                 'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
                 'message' => $error->getMessage()
@@ -65,7 +54,7 @@ class TodoController extends Controller
                 'message' => 'get tasks by id success.'
             ];
 
-        } catch (QueryException $error) {
+        } catch (Exception $error) {
             $result = [
                 'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
                 'error' => $error->getMessage()
@@ -75,26 +64,72 @@ class TodoController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Store a newly created resource in storage.
      */
-    public function edit(string $id)
+    public function createTodo(Request $request)
     {
-        //
+        $data = $request->only('task');
+        try {
+            $result = [
+                'status' => Response::HTTP_CREATED,
+                'data' => $this->todoService->create($data),
+                'message' => 'create task success.'
+            ];
+        } catch (Exception $error) {
+            $result = [
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'error' => $error->getMessage()
+            ];
+        }
+        return response()->json($result);
+
     }
+
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function updateTodo(Request $request, string $id)
     {
-        //
+        $data = $request->only('task');
+        try {
+
+            $this->todoService->update($id, $data);
+
+            $result = [
+                'status' => Response::HTTP_OK,
+                'data' => $this->todoService->getById($id),
+                'message' => 'update task success.'
+            ];
+        } catch (Exception $error) {
+            $result = [
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'error' => $error->getMessage()
+            ];
+        }
+        
+        return response()->json($result); 
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function deleteTodo(string $id)
     {
-        //
+        try {
+            $result = [
+                'status' => Response::HTTP_OK,
+                'data' => null,
+                'message' => 'delete task success.'
+            ];
+            $this->todoService->delete($id);
+        } catch (Exception $error) {
+            $result = [
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'error' => $error->getMessage()
+            ];
+        }
+        return response()->json($result);
     }
+
 }

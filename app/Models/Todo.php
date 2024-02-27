@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class Todo extends Model
 {
@@ -13,5 +13,4 @@ class Todo extends Model
     protected $collection = 'tasks';
     protected $primaryKey = '_id';
     protected $fillable = ['task'];
-
 }

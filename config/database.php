@@ -38,8 +38,8 @@ return [
 
         'mongodb' => [
             'driver' => 'mongodb',
-            'dsn' => env('DB_URI', 'mongodb://localhost:27017/?retryWrites=true&loadBalanced=false&serverSelectionTimeoutMS=5000&connectTimeoutMS=10000&3t.uriVersion=3&3t.connection.name=localhost&3t.defaultColor=1,131,14&3t.alwaysShowAuthDB=true&3t.alwaysShowDBFromUserRole=true'),
-            'database' => 'jwt-todolist',
+            'dsn' => env('DB_URI', 'mongodb://localhost:27017/'),
+            'database' => 'jwt-todo',
           ],
 
         'sqlite' => [

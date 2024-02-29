@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\TodoController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,9 +16,25 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/show_all', [TodoController::class, 'showAll']);
-Route::post('/show_by_id/{id}', [TodoController::class, 'showById']);
-Route::post('/create_todo', [TodoController::class, 'createTodo']);
-Route::put('/update_todo/{id}', [TodoController::class, 'updateTodo']);
-Route::delete('/delete_todo/{id}', [TodoController::class, 'deleteTodo']);
+Route::middleware('auth:api')->group(function () {
+    Route::post('/refresh', [AuthController::class, 'refresh']);
+    Route::post('/remove/{id}', [AuthController::class, 'deleteUser']);
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);   
+
+    Route::get('/show_all', [TodoController::class, 'showAll']);
+    Route::post('/show_by_id/{id}', [TodoController::class, 'showById']);
+    Route::post('/create_todo', [TodoController::class, 'createTodo']);
+    Route::put('/update_todo/{id}', [TodoController::class, 'updateTodo']);
+    Route::delete('/delete_todo/{id}', [TodoController::class, 'deleteTodo']);
+});
+
+Route::prefix('auth')->group(function ($router) {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+    
+
+});
+
+
 

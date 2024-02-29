@@ -38,7 +38,7 @@ return [
 
         'mongodb' => [
             'driver' => 'mongodb',
-            'dsn' => env('DB_URI', 'mongodb://localhost:27017/'),
+            'dsn' => env('DB_URI', 'mongodb://localhost:27017/?retryWrites=true&loadBalanced=false&serverSelectionTimeoutMS=5000&connectTimeoutMS=10000'),
             'database' => 'jwt-todo',
           ],
 

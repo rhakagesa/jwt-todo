@@ -19,10 +19,16 @@ class AuthRepository
         return $user;
     }
 
-    public function remove($id)
+    public function update(array $data)
     {
-        $user = $this->user->find($id)->delete();
-        return $user;
+        $user = $this->user->find($data['_id']);
+        return $user->update($data);
+    }
+
+    public function remove(array $id)
+    {
+        $user = $this->user->find($id['_id']);
+        return $user->delete();
     }
 
 }

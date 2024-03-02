@@ -17,10 +17,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:api')->group(function () {
-    Route::post('/refresh', [AuthController::class, 'refresh']);
-    Route::delete('/remove/{id}', [AuthController::class, 'deleteUser']);
     Route::get('/me', [AuthController::class, 'me']);
-    Route::post('/logout', [AuthController::class, 'logout']);   
+    Route::post('/refresh', [AuthController::class, 'refresh']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::put('/update', [AuthController::class, 'updateUser']);
+    Route::delete('/remove', [AuthController::class, 'deleteUser']);
+   
 
     Route::get('/show_all', [TodoController::class, 'showAll']);
     Route::post('/show_by_id/{id}', [TodoController::class, 'showById']);
@@ -29,7 +31,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/delete_todo/{id}', [TodoController::class, 'deleteTodo']);
 });
 
-Route::prefix('auth')->group(function ($router) {
+Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 });

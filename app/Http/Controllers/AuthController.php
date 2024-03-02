@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Services\AuthService;
 use Exception;
-use Illuminate\Support\Facades\Validator;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -53,16 +49,25 @@ class AuthController extends Controller
     public function login()
     {
         $credentials = request(['email', 'password']);
-
-        if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+    
+        try{
+            $result = [
+                'status' => Response::HTTP_OK,
+                'data' => [
+                    'access_token' => $this->authService->login($credentials),
+                    'token_type' => 'bearer',
+                    'expires_in' => auth()->factory()->getTTL() * 60
+                ],
+                'message' => 'success'
+            ];
+        } catch (Exception $e) {
+            $result = [
+                'status' => Response::HTTP_UNAUTHORIZED,
+                'error' => 'Unauthorized. '.$e->getMessage()
+            ];
         }
 
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
-        ]);
+        return response()->json($result);
     }
 
     /**
@@ -72,7 +77,48 @@ class AuthController extends Controller
      */
     public function me()
     {
-        return response()->json(auth()->user());
+        try{
+            $result = [
+                'status' => Response::HTTP_OK,
+                'data' => $this->authService->getInfo(),
+                'message' => 'success'
+            ];
+        } catch (Exception $e) {
+            $result = [
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'error' => $e->getMessage()
+            ];
+        }
+
+        return response()->json($result);
+    }
+
+       /**
+     * Refresh a token.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function refresh()
+    {
+        try{
+            $token = $this->authService->refresh();
+            $result = [
+                'status' => Response::HTTP_OK,
+                'data' => [
+                    'access_token' => $token,
+                    'token_type' => 'bearer',
+                    'expires_in' => auth()->factory()->getTTL() * 60
+                ],
+                'message' => 'success'
+            ];
+        } catch (Exception $e) {
+            $result = [
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'error' => $e->getMessage()
+            ];
+        }
+
+        return response()->json([$result]);
     }
 
     /**
@@ -82,31 +128,58 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        auth()->logout();
-
-        return response()->json(['message' => 'Successfully logged out']);
+        try{
+            $this->authService->logout();
+            $result = [
+                'status' => Response::HTTP_OK,
+                'message' => 'logout success.'
+            ];
+        } catch (Exception $e) {
+            $result = [
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'error' => $e->getMessage()
+            ];
+        }
+        return response()->json($result);
     }
 
-    /**
-     * Refresh a token.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function refresh()
+    public function updateUser(Request $request)
     {
-        $token = auth()->refresh();
+        $data = $request->only('_id', 'name', 'email', 'password');
 
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
-        ]);
-    
+        try{
+            $this->authService->updateUser($data);
+            $result = [
+                'status' => Response::HTTP_OK,
+                'message' => 'user has been updated.',
+            ];
+        } catch (Exception $e) {
+            $result = [
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'error' => $e->getMessage()
+            ];
+        }
+
+        return response()->json($result);
     }
 
-    public function deleteUser($id)
+    public function deleteUser(Request $request)
     {
-        $user = $this->authService->removeUser($id);
-        return $user;
+        $data = $request->only('_id');
+
+        try{
+            $this->authService->removeUser($data);
+            $result = [
+                'status' => Response::HTTP_OK,
+                'message' => 'user has been removed.',
+            ];
+        } catch (Exception $e) {
+            $result = [
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'error' => $e->getMessage()
+            ];
+        }
+
+        return response()->json($result);
     }
 }

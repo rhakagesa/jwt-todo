@@ -14,35 +14,18 @@ class TodoService {
         $this->todoRepository = $todoRepository;
     }
 
-        /**
-     * Get all tasks.
-     *
-     * @return Object
-     */
     public function getAll() : Object 
     {
         $tasks = $this->todoRepository->getAll();
         return $tasks;
     }
 
-    /**
-     * Get a task by its ID.
-     *
-     * @param string $id The ID of the task to retrieve
-     * @return Object The task object
-     */
     public function getById(string $id) : Object 
     {
         $tasks = $this->todoRepository->getById($id);
         return $tasks;
     }
 
-    /**
-     * Create data in the database.
-     *
-     * @param array $data The data to be stored
-     * @return Object The stored data
-     */
     public function create(array $data)
     {
         try {
@@ -61,13 +44,6 @@ class TodoService {
         }
     }
 
-    /**
-     * Update a record with the given ID and data.
-     *
-     * @param string $id The ID of the record to update
-     * @param array $data The data to update the record with
-     * @return Object The updated record
-     */
     public function update(string $id, array $data)
     {
         try {
@@ -86,12 +62,6 @@ class TodoService {
         }
     }
 
-    /**
-     * Delete a task by its ID.
-     *
-     * @param string $id The ID of the task to delete
-     * @return Object The deleted task
-     */
     public function delete(string $id)
     {
         $tasks = $this->todoRepository->delete($id);
